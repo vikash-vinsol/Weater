@@ -12,6 +12,7 @@
 {
     NSDictionary *weather;
     NSDictionary *details;
+    int cod;
 }
 @property (strong, nonatomic) IBOutlet UITextField *textField;
 @property (strong, nonatomic) IBOutlet UILabel *tempLabel;

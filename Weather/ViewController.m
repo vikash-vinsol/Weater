@@ -31,17 +31,25 @@
 
 - (IBAction)pressMe:(id)sender
 {
-    NSString *finalURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?q=%@",textField.text];
-    NSData *jsonData = [NSData dataWithContentsOfURL:[NSURL URLWithString:finalURL]];
+    [textField resignFirstResponder];
+    NSString *finalURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?q=%@",[textField.text  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+  
+    NSData *jsonData = [NSData dataWithContentsOfURL:[NSURL URLWithString:finalURL ]];
     [self performSelectorOnMainThread:@selector(fetchedData:) withObject:jsonData waitUntilDone:YES];
     
-    tempLabel.text     = [NSString stringWithFormat:@"%@",[weather objectForKey:@"temp"]];
-    maxTlabel.text     = [NSString stringWithFormat:@"%@",[weather objectForKey:@"temp_max"]];
-    minTlabel.text     = [NSString stringWithFormat:@"%@",[weather objectForKey:@"temp_min"]];
-    humidityLabel.text = [NSString stringWithFormat:@"%@",[weather objectForKey:@"humidity"]];
-    PresLabel.text     = [NSString stringWithFormat:@"%@",[weather objectForKey:@"pressure"]];
-    [textField resignFirstResponder];
-
+    if (cod == 404)
+    {
+        tempLabel.text = maxTlabel.text = minTlabel.text = humidityLabel.text = PresLabel.text = @"-";
+    }
+    
+    else
+    {
+        tempLabel.text     = [NSString stringWithFormat:@"%@",[weather objectForKey:@"temp"]];
+        maxTlabel.text     = [NSString stringWithFormat:@"%@",[weather objectForKey:@"temp_max"]];
+        minTlabel.text     = [NSString stringWithFormat:@"%@",[weather objectForKey:@"temp_min"]];
+        humidityLabel.text = [NSString stringWithFormat:@"%@",[weather objectForKey:@"humidity"]];
+        PresLabel.text     = [NSString stringWithFormat:@"%@",[weather objectForKey:@"pressure"]];
+    }
 }
 
 - (void)fetchedData:(NSData *)responseData
@@ -50,6 +58,8 @@
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:responseData options:kNilOptions error:&error];
     weather = [json objectForKey:@"main"];
     NSLog(@"%@",[[json objectForKey:@"main"]objectForKey:@"temp"]);
+    cod = [[json objectForKey:@"cod"] integerValue];
+    NSLog(@"cod value%d",cod);
 }
 
 @end
